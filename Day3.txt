@@ -1,0 +1,149 @@
+1st Problem - Get user info from /etc/passwd
+tushar@DESKTOP-OCHMD3U:/etc$ cat passwd
+tushar@DESKTOP-OCHMD3U:/etc$ cat passwd |awk -F: '{print $1}'
+tushar@DESKTOP-OCHMD3U:/etc$ cat passwd |awk -F: '{if ($3>=1000) print $1,$2,$3 }'
+nobody x 65534
+tushar x 1000
+
+
+2nd Problem - Move files from one folder to the respective folders.
+touch abc.txt def.txt ghi.txt jkl.txt
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/Documents/FirstDirectory (master)
+$ for file in `ls *.txt`; do folderName=`echo $file | awk -F. '{print $1}'`; mkdir $folderName; mv $file $folderName; done
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/Documents/FirstDirectory (master)
+$ ls
+a/  abc/  access.log  branch1file1  data/  def/  ghi/  jkl/
+
+
+3rd Problem - Append current date to all log files name which has extension .log.1 from a folder
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ touch abc.log.1 def.log.1 ghi.log.1 jkl.log.1 mno.log.1
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ ls
+a/  abc/  abc.log.1  branch1file1  data/  def/  def.log.1  ghi/  ghi.log.1  jkl/  jkl.log.1  mno.log.1
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ for file in `ls *.log.1`
+>do 
+>baseName=`echo $file | awk -F. '{print $1}'` 
+>dt=`date +%d%m%y | awk '{print $0}'` 
+>mv $file $baseName$dt'.log' 
+>done
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ ls
+a/  abc/  abc170821.log  branch1file1  data/  def/  def170821.log  ghi/  ghi170821.log  jkl/  jkl170821.log  mno170821.log
+
+
+4th Problem - Archive the files from /var/log folder which have modified 7 days ago and move it to your backup folder
+tushar@DESKTOP-OCHMD3U:/var/log$ for i in `ls /var/log/*.log`; do modified_date=`stat $i | grep -i "modify" | awk '{print $2}'`; present_date=`date +%Y-%m-%d`; diff=`dateutils.ddiff $modified_date $present_date`; if [ $diff -gt 7 ]; then cp $i Backup; fi; done
+
+
+5th Problem - Print last 4 frequently access urls count in sorted order from /var/log/httpd/access.log
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ cat access.log| awk -F'"' '{print $2}'|awk '{print $2}'|sort |uniq -c|sort |tail -4
+    199 /favicon.ico
+    199 /runtime.js
+    199 /scripts.js
+    199 /vendor.js
+
+
+6th Problem - Print list of web response code count in the unique sorted order at specific hours
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ cat access.log| awk '{print $9}'|sort|uniq -c
+   3176 200
+      8 206
+     26 304
+
+
+7th Problem - Print list of last 10 unique sorted client IP from /var/log/httpd/access.log
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ cat access.log| awk '{print $1}'|sort|uniq -c|sort -r|head -4
+    383 10.56.2.2
+    345 10.56.19.3
+    323 10.56.21.2
+    285 10.56.6.4
+
+
+8th Problem - Check if a folder exists or not. If its not present, create it
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ if ( find ~ checkfol | grep -c checkfol ) > 0; then echo File already exists; else mkdir checkfol && echo File created; fi
+find: ‘/c/Users/tushar.kasturi_ymedi/AppData/Local/Temp/WinSAT’: Permission denied
+find: ‘checkfol’: No such file or directory
+File created
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ if ( find ~ checkfol | grep -c checkfol ) > 0; then echo File already exists; else mkdir checkfol && echo File created; fi
+find: ‘/c/Users/tushar.kasturi_ymedi/AppData/Local/Temp/WinSAT’: Permission denied
+File already exists
+
+
+9th Problem - Execute command "hello" and "ls" and check its execution status and print whether command executed successful or not
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ Hello
+bash: Hello: command not found
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ if [ `echo $? == 0` ] ; then echo Successful; else echo Unsuccessful; fi
+Unsuccessful
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ ls
+0   abc/           access.log  backup.sh*    checkfol/  data.txt  def170821.log  ghi170821.log  jkl170821.log
+a/  abc170821.log  backup/     branch1file1  data/      def/      ghi/           jkl/           mno170821.log
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ if [ `echo $? == 0` ] ; then echo Successful; else echo Unsuccessful; fi
+Successful
+
+
+10th Problem - Set environment usersecret="dH34xJaa23" if its already not set
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ [ -z $usersecret ] && export usersecret="dH34xJaa23" || echo "already set"
+tushar.kasturi_ymedi@DESKTOP-OCHMD3U MINGW64 ~/documents/FirstDirectory (master)
+$ [ -z $usersecret ] && export usersecret="dH34xJaa23" || echo "already set"
+already set
+
+
+11th Problem - Find a word "systemd" from all log files in the folder /var/lognd print number of occurrence more than 0 against each file.
+tushar@DESKTOP-OCHMD3U:/var/log$ grep -i "systemd" var/log/*
+grep: var/log/*: No such file or directory
+tushar@DESKTOP-OCHMD3U:/var/log$ grep -i "systemd" /var/log/*
+grep: /var/log/apt: Is a directory
+grep: /var/log/dist-upgrade: Is a directory
+/var/log/dpkg.log:2020-08-21 17:31:54 status triggers-pending systemd:amd64 237-3ubuntu10.42
+/var/log/dpkg.log:2020-08-21 17:31:55 trigproc systemd:amd64 237-3ubuntu10.42 <none>
+/var/log/dpkg.log:2020-08-21 17:31:55 status half-configured systemd:amd64 237-3ubuntu10.42
+/var/log/dpkg.log:2020-08-21 17:31:55 status installed systemd:amd64 237-3ubuntu10.42
+/var/log/dpkg.log:2020-08-21 17:52:12 status triggers-pending systemd:amd64 237-3ubuntu10.42
+/var/log/dpkg.log:2020-08-21 17:52:19 trigproc systemd:amd64 237-3ubuntu10.42 <none>
+/var/log/dpkg.log:2020-08-21 17:52:19 status half-configured systemd:amd64 237-3ubuntu10.42
+/var/log/dpkg.log:2020-08-21 17:52:19 status installed systemd:amd64 237-3ubuntu10.42
+grep: /var/log/journal: Is a directory
+grep: /var/log/landscape: Is a directory
+grep: /var/log/lxd: Is a directory
+grep: /var/log/tallylog: Permission denied
+grep: /var/log/unattended-upgrades: Is a directory
+
+
+
+12th Problem - Create process list table displays process id, parent process id, command name, % of memory consumption, % of cpu utilization
+tushar@DESKTOP-OCHMD3U:~$ ps -efo pid,ppid,cmd,%mem,%cpu
+  PID  PPID CMD                         %MEM %CPU
+    7     6 -bash HOSTTYPE=x86_64 LANG=  0.0  0.4
+   33     7  \_ ps -efo pid,ppid,cmd,%m  0.0  0.0
+
+
+13th Problem - Data analysis /manipulation (Awk)
+cat data.csv | awk '$4>10000 {print$2 " " $7}'
+cat data.csv | awk '$4>10000 {print$0}'
+cat data.csv | awk '$4>10000 {print$0}'| awk '{print $2"    "$7}'
+cat data.csv | grep CAPTAIN|awk '{sum=sum+$7} END{print sum}'
+cat data.csv | grep CAPTAIN|awk '{sum=sum+$7} END{print sum}'
+cat data.csv | awk '$5>7000 && $5<10000 {print $3 " " $5}'
+tail +2 data.csv | awk '{sum+=$4} END{print sum/NR}'
+
+14th Problem - Difference between original file and updated file
+file1="def"
+file2="abc"
+diff $file1 $file2
+
+
+
+
+
+
